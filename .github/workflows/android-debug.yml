@@ -1,0 +1,64 @@
+name: Baglan Android Debug
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ARMv7 Debug APK
+    runs-on: ubuntu-latest
+    env:
+      CCACHE_COMPILERCHECK: "%compiler% -dumpmachine; %compiler% -dumpversion"
+      CCACHE_HARDLINK: "true"
+      CCACHE_NOHASHDIR: "true"
+      CCACHE_MAXSIZE: "2G"
+      NATIVE_TARGET: "armeabi-v7a"
+    steps:
+      - name: Checkout source and native submodules
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+          submodules: recursive
+
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up native compiler cache
+        uses: hendrikmuhs/ccache-action@v1.2.23
+        with:
+          key: android-armv7
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: "build-tools;36.0.0 ndk;27.2.12479018 platforms;android-36"
+
+      - name: Configure SDK and native cache
+        run: |
+          echo "sdk.dir=${ANDROID_HOME}" >> local.properties
+          echo "ANDROID_CCACHE=$(command -v ccache || true)" >> "$GITHUB_ENV"
+
+      - name: Build ARMv7 debug APK
+        run: ./gradlew --no-daemon TMessagesProj:assembleAfatDebug
+
+      - name: Upload Baglan APK
+        uses: actions/upload-artifact@v7
+        with:
+          name: Baglan-armv7-debug
+          path: TMessagesProj/build/outputs/apk/afat/debug/Baglan.apk
+          if-no-files-found: error

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "130920531475",
+    "project_id": "baglan-c4a93",
+    "storage_bucket": "baglan-c4a93.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:130920531475:android:c62e5d813703de866aa1e6",
+        "android_client_info": {
+          "package_name": "tm.baglan.messenger"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFQGp3Qm1PE69JAhPMDbHOKEDzFdYyD04"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,281 @@
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+
+apply plugin: 'com.android.application'
+apply plugin: 'org.telegram.build-plugin'
+apply plugin: 'org.telegram.build-app-plugin'
+apply plugin: 'idea'
+
+def nativeTarget = System.getenv('NATIVE_TARGET') ?: 'universal'
+def targetAbis = nativeTarget == 'universal'
+        ? ['armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64']
+        : [nativeTarget == 'armv7' ? 'armeabi-v7a' : nativeTarget]
+
+idea {
+    module {
+        excludeDirs += [
+            file('jni/td'),
+            file('jni/third_party/absl'),
+            file('jni/third_party/boringssl'),
+            file('jni/third_party/dav1d'),
+            file('jni/third_party/ffmpeg'),
+            file('jni/third_party/libvpx'),
+            file('jni/third_party/libyuv'),
+            file('jni/third_party/openh264'),
+            file('jni/third_party/xiph'),
+            file('jni/tlottie'),
+            file('jni/voip/webrtc'),
+            file('jni/sqlite')
+        ]
+    }
+}
+
+repositories {
+    mavenCentral()
+    google()
+}
+
+configurations {
+    compile.exclude module: 'support-v4'
+}
+
+configurations.all {
+    exclude group: 'com.google.firebase', module: 'firebase-core'
+    exclude group: 'androidx.recyclerview', module: 'recyclerview'
+}
+
+dependencies {
+    implementation 'androidx.core:core:1.16.0'
+    implementation 'androidx.palette:palette:1.0.0'
+    implementation 'androidx.exifinterface:exifinterface:1.3.6'
+    implementation 'androidx.dynamicanimation:dynamicanimation:1.0.0'
+    implementation "androidx.sharetarget:sharetarget:1.2.0"
+    implementation 'androidx.interpolator:interpolator:1.0.0'
+    implementation 'androidx.biometric:biometric:1.1.0'
+    implementation 'androidx.webkit:webkit:1.14.0'
+
+    implementation 'com.google.android.gms:play-services-cast-framework:21.4.0'
+    implementation "androidx.mediarouter:mediarouter:1.7.0"
+    implementation 'com.google.zxing:core:3.5.4'
+
+    implementation 'androidx.car.app:app:1.4.0'
+    implementation 'androidx.car.app:app-projected:1.4.0'
+    implementation 'org.nanohttpd:nanohttpd:2.3.1'
+
+    compileOnly 'org.checkerframework:checker-qual:2.5.2'
+    compileOnly 'org.checkerframework:checker-compat-qual:2.5.0'
+    implementation 'com.google.firebase:firebase-messaging:22.0.0'
+    implementation 'com.google.firebase:firebase-datatransport:18.1.0'
+    implementation 'com.google.firebase:firebase-appindexing:20.0.0'
+    implementation 'com.google.android.gms:play-services-maps:18.1.0'
+    implementation 'com.google.android.gms:play-services-auth:20.4.0'
+    implementation 'com.google.android.gms:play-services-vision:20.1.3'
+    implementation 'com.google.android.gms:play-services-wearable:18.0.0'
+    implementation 'com.google.android.gms:play-services-location:21.0.1'
+    implementation 'com.google.android.gms:play-services-wallet:19.1.0'
+    implementation 'com.googlecode.mp4parser:isoparser:1.0.6'
+    implementation 'com.stripe:stripe-android:2.0.2'
+    implementation 'com.google.mlkit:language-id:17.0.6'
+    implementation 'com.android.billingclient:billing:8.0.0'
+    implementation 'com.google.code.gson:gson:2.11.0'
+    implementation 'com.google.guava:guava:31.1-android'
+    implementation 'com.google.android.play:integrity:1.3.0'
+    implementation 'com.google.android.gms:play-services-safetynet:18.0.1'
+
+    implementation 'com.google.android.gms:play-services-mlkit-subject-segmentation:16.0.0-beta1'
+    implementation 'com.google.android.gms:play-services-mlkit-image-labeling:16.0.8'
+
+    implementation "androidx.credentials:credentials:1.6.0-alpha04"
+    implementation "androidx.credentials:credentials-play-services-auth:1.6.0-alpha04"
+
+    implementation "io.noties.markwon:core:4.6.2"
+    implementation "io.noties.markwon:ext-strikethrough:4.6.2"
+    implementation "io.noties.markwon:ext-tables:4.6.2"
+    implementation "io.noties.markwon:html:4.6.2"
+    implementation "io.noties.markwon:inline-parser:4.6.2"
+    implementation("io.noties.markwon:ext-latex:4.6.2") {
+        exclude group: 'ru.noties', module: 'jlatexmath-android'
+    }
+
+    implementation 'androidx.media3:media3-exoplayer:1.11.1'
+    implementation 'androidx.media3:media3-exoplayer-dash:1.11.1'
+    implementation 'androidx.media3:media3-exoplayer-hls:1.11.1'
+    implementation 'androidx.media3:media3-decoder-ffmpeg:1.11.1'
+    implementation 'androidx.media3:media3-session:1.11.1'
+    implementation project(':jlatexmath')
+    implementation files('libs/libgsaverification-client.aar')
+
+//    implementation 'com.google.mlkit:translate:17.0.3'
+
+    constraints {
+        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0") {
+            because("kotlin-stdlib-jdk7 is now a part of kotlin-stdlib")
+        }
+        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0") {
+            because("kotlin-stdlib-jdk8 is now a part of kotlin-stdlib")
+        }
+    }
+    implementation 'com.google.android.recaptcha:recaptcha:18.7.1'
+
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
+}
+
+android {
+    compileSdkVersion 36
+    buildToolsVersion '36.0.0'
+    ndkVersion "27.2.12479018"
+
+    sourceSets.main.jniLibs.srcDirs = ['./jni/']
+    sourceSets.debug.manifest.srcFile 'config/debug/AndroidManifest.xml'
+    sourceSets.release.manifest.srcFile 'config/release/AndroidManifest.xml'
+
+    externalNativeBuild {
+        cmake {
+            path 'jni/CMakeLists.txt'
+        }
+    }
+
+    lintOptions {
+        disable 'MissingTranslation'
+        disable 'ExtraTranslation'
+        disable 'BlockedPrivateApi'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+
+        coreLibraryDesugaringEnabled true
+    }
+
+
+    defaultConfig {
+        applicationId APP_PACKAGE
+        versionCode Integer.parseInt(APP_VERSION_CODE)
+        versionName APP_VERSION_NAME
+        minSdkVersion 21
+        targetSdkVersion 36
+
+        vectorDrawables.generatedDensities = ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi']
+
+        multiDexEnabled true
+
+        externalNativeBuild {
+            cmake {
+                version '3.22.1'
+                arguments '-DANDROID_STL=c++_static', '-DANDROID_PLATFORM=android-21' //, '-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON'
+                def ccachePath = System.getenv('ANDROID_CCACHE')
+                if (ccachePath != null && !ccachePath.isBlank()) {
+                    arguments "-DANDROID_CCACHE=${ccachePath}"
+                }
+                targets 'tmessages.49'
+            }
+        }
+    }
+
+    androidResources {
+        noCompress += "pack"
+        localeFilters += ["zz"]
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file("config/release.keystore")
+            storePassword RELEASE_STORE_PASSWORD
+            keyAlias RELEASE_KEY_ALIAS
+            keyPassword RELEASE_KEY_PASSWORD
+        }
+        release {
+            storeFile file("config/release.keystore")
+            storePassword RELEASE_STORE_PASSWORD
+            keyAlias RELEASE_KEY_ALIAS
+            keyPassword RELEASE_KEY_PASSWORD
+        }
+    }
+
+    buildTypes {
+        debug {
+            jniDebuggable true
+            shrinkResources false
+            multiDexEnabled true
+            signingConfig signingConfigs.debug
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            ndk.debugSymbolLevel = 'FULL'
+            buildConfigField "String", "BUILD_VERSION_STRING", "\"" + APP_VERSION_NAME + "\""
+            buildConfigField "String", "BETA_URL", "\"" + getProps("BETA_PRIVATE_URL") + "\""
+            buildConfigField "boolean", "DEBUG_VERSION", "true"
+            buildConfigField "boolean", "DEBUG_PRIVATE_VERSION", "true"
+            buildConfigField "boolean", "BUNDLE", "false"
+            buildConfigField "int", "VERSION_NUM", "0"
+        }
+
+        release {
+            jniDebuggable false
+            shrinkResources false
+            multiDexEnabled true
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            ndk.debugSymbolLevel = 'FULL'
+            buildConfigField "String", "BUILD_VERSION_STRING", "\"" + APP_VERSION_NAME + "\""
+            buildConfigField "String", "BETA_URL", "\"\""
+            buildConfigField "boolean", "DEBUG_VERSION", "false"
+            buildConfigField "boolean", "DEBUG_PRIVATE_VERSION", "false"
+            buildConfigField "boolean", "BUNDLE", "false"
+            buildConfigField "int", "VERSION_NUM", "7"
+        }
+    }
+
+    flavorDimensions "minApi"
+    productFlavors {
+        bundleAfat {
+            ndk { abiFilters(*targetAbis) }
+            ext { abiVersionCode = 1 }
+            buildConfigField "boolean", "BUNDLE", "true"
+        }
+        bundleAfat_SDK23 {
+            ndk { abiFilters(*targetAbis) }
+            minSdkVersion 23
+            sourceSets.debug.manifest.srcFile 'config/debug/AndroidManifest_SDK23.xml'
+            sourceSets.release.manifest.srcFile 'config/release/AndroidManifest_SDK23.xml'
+            ext { abiVersionCode = 2 }
+            buildConfigField "boolean", "BUNDLE", "true"
+        }
+        afat {
+            ndk { abiFilters(*targetAbis) }
+            ext { abiVersionCode = 9 }
+            buildConfigField "boolean", "BUNDLE", "false"
+        }
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            outputFileName = "Baglan.apk"
+            output.versionCodeOverride = defaultConfig.versionCode * 10 + variant.productFlavors.get(0).abiVersionCode
+        }
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+    variantFilter { variant ->
+        def names = variant.flavors*.name
+        if (variant.buildType.name != "release" && !names.contains("afat")) setIgnore(true)
+    }
+
+    namespace 'org.telegram.messenger'
+}
+
+
+def getProps(String propName) {
+    def propsFile = rootProject.file('local.properties')
+    if (propsFile.exists()) {
+        def props = new Properties()
+        props.load(new FileInputStream(propsFile))
+        return props[propName]
+    } else {
+        return "";
+    }
+}
+apply plugin: 'com.google.gms.google-services'
