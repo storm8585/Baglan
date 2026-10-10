@@ -96,11 +96,11 @@ dependencies {
         exclude group: 'ru.noties', module: 'jlatexmath-android'
     }
 
-    implementation 'androidx.media3:media3-exoplayer:1.11.1'
-    implementation 'androidx.media3:media3-exoplayer-dash:1.11.1'
-    implementation 'androidx.media3:media3-exoplayer-hls:1.11.1'
-    implementation 'androidx.media3:media3-decoder-ffmpeg:1.11.1'
-    implementation 'androidx.media3:media3-session:1.11.1'
+    api project(":TMessagesProj_Modules:media3:media-lib-exoplayer")
+    api project(":TMessagesProj_Modules:media3:media-lib-exoplayer-dash")
+    api project(":TMessagesProj_Modules:media3:media-lib-exoplayer-hls")
+    api project(":TMessagesProj_Modules:media3:media-lib-decoder-ffmpeg")
+    api project(":TMessagesProj_Modules:media3:media-lib-session")
     implementation project(':jlatexmath')
     implementation files('libs/libgsaverification-client.aar')
 
