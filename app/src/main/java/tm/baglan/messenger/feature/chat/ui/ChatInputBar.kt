@@ -10,14 +10,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -122,7 +119,7 @@ fun ChatInputBar(
     )
 
     val textPaddingEnd by animateDpAsState(
-        targetValue = if (hasText) 2.dp else 50.dp,
+        targetValue = if (hasText) 46.dp else 88.dp,
         animationSpec = tween(
             durationMillis = 150,
             easing = FastOutSlowInEasing
@@ -130,94 +127,89 @@ fun ChatInputBar(
         label = "textPaddingEnd"
     )
 
-    Row(
+    Box(
         modifier = modifier
             .fillMaxWidth()
             .navigationBarsPadding()
-            .padding(start = 7.dp, end = 7.dp, top = 4.dp, bottom = 9.dp),
-        verticalAlignment = Alignment.Bottom
+            .padding(start = 7.dp, end = 7.dp, top = 4.dp, bottom = 9.dp)
+            .shadow(elevation = 1.dp, shape = RoundedCornerShape(22.dp))
+            .clip(RoundedCornerShape(22.dp))
+            .background(BaglanTheme.colors.inputBackground)
+            .heightIn(min = 44.dp)
     ) {
+        IconButton(
+            onClick = {},
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(start = 2.dp)
+                .size(44.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.msg_emoji_smiles),
+                contentDescription = null,
+                tint = BaglanTheme.colors.inputIcons,
+                modifier = Modifier.size(28.dp)
+            )
+        }
+
         Box(
             modifier = Modifier
-                .weight(1f)
-                .shadow(elevation = 1.dp, shape = RoundedCornerShape(22.dp))
-                .clip(RoundedCornerShape(22.dp))
-                .background(BaglanTheme.colors.inputBackground)
-                .heightIn(min = 44.dp)
+                .fillMaxWidth()
+                .align(Alignment.BottomStart)
+                .padding(start = 52.dp, end = textPaddingEnd, top = 9.dp, bottom = 10.dp)
         ) {
-            IconButton(
-                onClick = {},
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(start = 2.dp)
-                    .size(44.dp)
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.msg_emoji_smiles),
-                    contentDescription = null,
-                    tint = BaglanTheme.colors.inputIcons,
-                    modifier = Modifier.size(28.dp)
+            if (text.isEmpty()) {
+                Text(
+                    text = "Message",
+                    style = MessageBodyStyle.copy(fontSize = 18.sp),
+                    color = BaglanTheme.colors.inputHint
                 )
             }
 
+            BasicTextField(
+                value = text,
+                onValueChange = onTextChanged,
+                textStyle = MessageBodyStyle.copy(
+                    fontSize = 18.sp,
+                    color = BaglanTheme.colors.inText
+                ),
+                cursorBrush = SolidColor(BaglanPrimary),
+                maxLines = 6,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        if (attachButtonAlpha > 0f) {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomStart)
-                    .padding(start = 52.dp, end = textPaddingEnd, top = 9.dp, bottom = 10.dp)
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 44.dp)
+                    .size(44.dp)
+                    .graphicsLayer {
+                        scaleX = attachButtonScale
+                        scaleY = attachButtonScale
+                        alpha = attachButtonAlpha
+                    },
+                contentAlignment = Alignment.Center
             ) {
-                if (text.isEmpty()) {
-                    Text(
-                        text = "Message",
-                        style = MessageBodyStyle.copy(fontSize = 18.sp),
-                        color = BaglanTheme.colors.inputHint
-                    )
-                }
-
-                BasicTextField(
-                    value = text,
-                    onValueChange = onTextChanged,
-                    textStyle = MessageBodyStyle.copy(
-                        fontSize = 18.sp,
-                        color = BaglanTheme.colors.inText
-                    ),
-                    cursorBrush = SolidColor(BaglanPrimary),
-                    maxLines = 6,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-
-            if (attachButtonAlpha > 0f) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .size(44.dp)
-                        .graphicsLayer {
-                            scaleX = attachButtonScale
-                            scaleY = attachButtonScale
-                            alpha = attachButtonAlpha
-                        },
-                    contentAlignment = Alignment.Center
+                IconButton(
+                    onClick = onAttachClicked,
+                    modifier = Modifier.size(44.dp)
                 ) {
-                    IconButton(
-                        onClick = onAttachClicked,
-                        modifier = Modifier.size(44.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.msg_input_attach2),
-                            contentDescription = null,
-                            tint = BaglanTheme.colors.inputIcons,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
+                    Icon(
+                        painter = painterResource(id = R.drawable.msg_input_attach2),
+                        contentDescription = null,
+                        tint = BaglanTheme.colors.inputIcons,
+                        modifier = Modifier.size(24.dp)
+                    )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.width(4.dp))
-
         Box(
-            modifier = Modifier.size(44.dp),
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .size(44.dp),
             contentAlignment = Alignment.Center
         ) {
             if (sendButtonAlpha > 0f) {
@@ -230,7 +222,7 @@ fun ChatInputBar(
                             scaleY = sendButtonScale
                             alpha = sendButtonAlpha
                         }
-                        .shadow(elevation = 1.5.dp, shape = CircleShape)
+                        .shadow(elevation = 1.dp, shape = CircleShape)
                         .clip(CircleShape)
                         .background(BaglanPrimary)
                         .clickable(
@@ -267,7 +259,7 @@ fun ChatInputBar(
                             scaleY = micButtonScale
                             alpha = micButtonAlpha
                         }
-                        .shadow(elevation = 1.5.dp, shape = CircleShape)
+                        .shadow(elevation = 1.dp, shape = CircleShape)
                         .clip(CircleShape)
                         .background(BaglanPrimary)
                         .clickable(
@@ -278,10 +270,10 @@ fun ChatInputBar(
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.input_mic),
+                        painter = painterResource(id = R.drawable.search_voice_filled),
                         contentDescription = null,
                         tint = Color.White,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(22.dp)
                     )
                 }
             }
