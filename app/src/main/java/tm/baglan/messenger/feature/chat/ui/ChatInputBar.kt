@@ -1,9 +1,11 @@
 package tm.baglan.messenger.feature.chat.ui
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -23,6 +25,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,12 +34,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import tm.baglan.messenger.R
 import tm.baglan.messenger.core.designsystem.BaglanPrimary
 import tm.baglan.messenger.core.designsystem.BaglanTheme
 import tm.baglan.messenger.core.designsystem.MessageBodyStyle
+
+private val EaseOutQuint = CubicBezierEasing(0.23f, 1f, 0.32f, 1f)
 
 @Composable
 fun ChatInputBar(
@@ -45,25 +54,103 @@ fun ChatInputBar(
     onAttachClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val density = LocalDensity.current.density
+    val hasText = text.isNotBlank()
+
+    val appearProgress = remember { Animatable(0f) }
+    LaunchedEffect(hasText) {
+        if (hasText) {
+            appearProgress.snapTo(0f)
+            appearProgress.animateTo(
+                targetValue = 1f,
+                animationSpec = tween(durationMillis = 320, easing = EaseOutQuint)
+            )
+        } else {
+            appearProgress.snapTo(0f)
+        }
+    }
+
+    val sendButtonScale by animateFloatAsState(
+        targetValue = if (hasText) 1f else 0.1f,
+        animationSpec = tween(
+            durationMillis = if (hasText) 220 else 150,
+            easing = EaseOutQuint
+        ),
+        label = "sendButtonScale"
+    )
+    val sendButtonAlpha by animateFloatAsState(
+        targetValue = if (hasText) 1f else 0f,
+        animationSpec = tween(
+            durationMillis = if (hasText) 220 else 150,
+            easing = EaseOutQuint
+        ),
+        label = "sendButtonAlpha"
+    )
+
+    val micButtonScale by animateFloatAsState(
+        targetValue = if (hasText) 0.1f else 1f,
+        animationSpec = tween(
+            durationMillis = if (hasText) 220 else 150,
+            easing = EaseOutQuint
+        ),
+        label = "micButtonScale"
+    )
+    val micButtonAlpha by animateFloatAsState(
+        targetValue = if (hasText) 0f else 1f,
+        animationSpec = tween(
+            durationMillis = if (hasText) 220 else 150,
+            easing = EaseOutQuint
+        ),
+        label = "micButtonAlpha"
+    )
+
+    val attachButtonScale by animateFloatAsState(
+        targetValue = if (hasText) 0.5f else 1f,
+        animationSpec = tween(
+            durationMillis = 100,
+            easing = FastOutSlowInEasing
+        ),
+        label = "attachButtonScale"
+    )
+    val attachButtonAlpha by animateFloatAsState(
+        targetValue = if (hasText) 0f else 1f,
+        animationSpec = tween(
+            durationMillis = 100,
+            easing = FastOutSlowInEasing
+        ),
+        label = "attachButtonAlpha"
+    )
+
+    val textPaddingEnd by animateDpAsState(
+        targetValue = if (hasText) 2.dp else 50.dp,
+        animationSpec = tween(
+            durationMillis = 150,
+            easing = FastOutSlowInEasing
+        ),
+        label = "textPaddingEnd"
+    )
+
     Row(
         modifier = modifier
             .fillMaxWidth()
             .navigationBarsPadding()
-            .padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 6.dp),
+            .padding(start = 7.dp, end = 7.dp, top = 4.dp, bottom = 9.dp),
         verticalAlignment = Alignment.Bottom
     ) {
-        Row(
+        Box(
             modifier = Modifier
                 .weight(1f)
                 .shadow(elevation = 1.dp, shape = RoundedCornerShape(22.dp))
                 .clip(RoundedCornerShape(22.dp))
                 .background(BaglanTheme.colors.inputBackground)
-                .heightIn(min = 48.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .heightIn(min = 44.dp)
         ) {
             IconButton(
                 onClick = {},
-                modifier = Modifier.size(44.dp)
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(start = 2.dp)
+                    .size(44.dp)
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.msg_emoji_smiles),
@@ -75,13 +162,14 @@ fun ChatInputBar(
 
             Box(
                 modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = 4.dp, vertical = 10.dp)
+                    .fillMaxWidth()
+                    .align(Alignment.BottomStart)
+                    .padding(start = 52.dp, end = textPaddingEnd, top = 9.dp, bottom = 10.dp)
             ) {
                 if (text.isEmpty()) {
                     Text(
                         text = "Message",
-                        style = MessageBodyStyle,
+                        style = MessageBodyStyle.copy(fontSize = 18.sp),
                         color = BaglanTheme.colors.inputHint
                     )
                 }
@@ -89,58 +177,106 @@ fun ChatInputBar(
                 BasicTextField(
                     value = text,
                     onValueChange = onTextChanged,
-                    textStyle = MessageBodyStyle.copy(color = BaglanTheme.colors.inText),
+                    textStyle = MessageBodyStyle.copy(
+                        fontSize = 18.sp,
+                        color = BaglanTheme.colors.inText
+                    ),
                     cursorBrush = SolidColor(BaglanPrimary),
                     maxLines = 6,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
 
-            IconButton(
-                onClick = onAttachClicked,
-                modifier = Modifier.size(44.dp)
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.msg_input_attach2),
-                    contentDescription = null,
-                    tint = BaglanTheme.colors.inputIcons,
-                    modifier = Modifier.size(24.dp)
-                )
+            if (attachButtonAlpha > 0f) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .size(44.dp)
+                        .graphicsLayer {
+                            scaleX = attachButtonScale
+                            scaleY = attachButtonScale
+                            alpha = attachButtonAlpha
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    IconButton(
+                        onClick = onAttachClicked,
+                        modifier = Modifier.size(44.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.msg_input_attach2),
+                            contentDescription = null,
+                            tint = BaglanTheme.colors.inputIcons,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                }
             }
         }
 
-        Spacer(modifier = Modifier.width(6.dp))
+        Spacer(modifier = Modifier.width(4.dp))
 
         Box(
-            modifier = Modifier
-                .size(48.dp)
-                .shadow(elevation = 2.dp, shape = CircleShape)
-                .clip(CircleShape)
-                .background(BaglanPrimary)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = {
-                        if (text.isNotBlank()) {
-                            onSendMessage()
-                        }
-                    }
-                ),
+            modifier = Modifier.size(44.dp),
             contentAlignment = Alignment.Center
         ) {
-            AnimatedContent(
-                targetState = text.isNotBlank(),
-                transitionSpec = { fadeIn() togetherWith fadeOut() },
-                label = "SendOrMic"
-            ) { hasText ->
-                if (hasText) {
+            if (sendButtonAlpha > 0f) {
+                val p = appearProgress.value
+                Box(
+                    modifier = Modifier
+                        .size(38.dp)
+                        .graphicsLayer {
+                            scaleX = sendButtonScale
+                            scaleY = sendButtonScale
+                            alpha = sendButtonAlpha
+                        }
+                        .shadow(elevation = 1.5.dp, shape = CircleShape)
+                        .clip(CircleShape)
+                        .background(BaglanPrimary)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = onSendMessage
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
                     Icon(
                         painter = painterResource(id = R.drawable.send_plane_24),
                         contentDescription = null,
                         tint = Color.White,
-                        modifier = Modifier.size(22.dp)
+                        modifier = Modifier
+                            .size(22.dp)
+                            .graphicsLayer {
+                                translationX = -24f * density * (1f - p)
+                                translationY = 24f * density * (1f - p)
+                                rotationZ = 60f * (1f - p)
+                                val s = 0.35f + 0.65f * p
+                                scaleX = s
+                                scaleY = s
+                            }
                     )
-                } else {
+                }
+            }
+
+            if (micButtonAlpha > 0f) {
+                Box(
+                    modifier = Modifier
+                        .size(38.dp)
+                        .graphicsLayer {
+                            scaleX = micButtonScale
+                            scaleY = micButtonScale
+                            alpha = micButtonAlpha
+                        }
+                        .shadow(elevation = 1.5.dp, shape = CircleShape)
+                        .clip(CircleShape)
+                        .background(BaglanPrimary)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = {}
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
                     Icon(
                         painter = painterResource(id = R.drawable.input_mic),
                         contentDescription = null,
