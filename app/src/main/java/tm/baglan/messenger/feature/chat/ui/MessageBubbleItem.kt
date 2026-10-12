@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -33,6 +34,7 @@ fun MessageBubbleItem(
     val chatColors = BaglanTheme.colors
     val isOutgoing = spec.message.isOutgoing
     val bubbleColor = if (isOutgoing) chatColors.outBubble else chatColors.inBubble
+    val shadowColor = if (isOutgoing) chatColors.outBubbleShadow else chatColors.inBubbleShadow
     val timeColor = if (isOutgoing) chatColors.outTime else chatColors.inTime
     val checkColor = if (isOutgoing) chatColors.outCheck else chatColors.inTime
 
@@ -40,8 +42,8 @@ fun MessageBubbleItem(
     val bubbleHeightDp = with(LocalDensity.current) { spec.bubbleHeight.toDp() }
 
     val verticalPadding = when {
-        spec.message.isBottomNear -> 1.dp
-        else -> 4.dp
+        spec.message.isBottomNear -> 2.dp
+        else -> 6.dp
     }
 
     Box(
@@ -64,6 +66,13 @@ fun MessageBubbleItem(
                             isBottomNear = spec.message.isBottomNear,
                             density = density
                         )
+
+                        translate(left = 0f, top = 1f * density) {
+                            drawPath(
+                                path = bubblePath,
+                                color = shadowColor
+                            )
+                        }
 
                         drawPath(
                             path = bubblePath,

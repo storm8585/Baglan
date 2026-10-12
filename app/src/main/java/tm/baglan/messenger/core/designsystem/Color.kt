@@ -11,8 +11,14 @@ val ChatBackgroundDark = Color(0xFF0F1620)
 val OutBubbleLight = Color(0xFFEFFFDE)
 val OutBubbleDark = Color(0xFF2B5278)
 
+val OutBubbleShadowLight = Color(0x221E750C)
+val OutBubbleShadowDark = Color(0x33000000)
+
 val InBubbleLight = Color(0xFFFFFFFF)
 val InBubbleDark = Color(0xFF1F2C33)
+
+val InBubbleShadowLight = Color(0x1F1D3753)
+val InBubbleShadowDark = Color(0x33000000)
 
 val TextPrimaryLight = Color(0xFF1A1D21)
 val TextPrimaryDark = Color(0xFFFFFFFF)

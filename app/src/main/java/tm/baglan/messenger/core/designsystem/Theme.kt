@@ -14,7 +14,9 @@ import androidx.compose.ui.graphics.Color
 data class BaglanChatColors(
     val chatBackground: Color,
     val outBubble: Color,
+    val outBubbleShadow: Color,
     val inBubble: Color,
+    val inBubbleShadow: Color,
     val outText: Color,
     val inText: Color,
     val outTime: Color,
@@ -31,7 +33,9 @@ data class BaglanChatColors(
 private val LightChatColors = BaglanChatColors(
     chatBackground = ChatBackgroundLight,
     outBubble = OutBubbleLight,
+    outBubbleShadow = OutBubbleShadowLight,
     inBubble = InBubbleLight,
+    inBubbleShadow = InBubbleShadowLight,
     outText = TextPrimaryLight,
     inText = TextPrimaryLight,
     outTime = OutTimeLight,
@@ -48,7 +52,9 @@ private val LightChatColors = BaglanChatColors(
 private val DarkChatColors = BaglanChatColors(
     chatBackground = ChatBackgroundDark,
     outBubble = OutBubbleDark,
+    outBubbleShadow = OutBubbleShadowDark,
     inBubble = InBubbleDark,
+    inBubbleShadow = InBubbleShadowDark,
     outText = TextPrimaryDark,
     inText = TextPrimaryDark,
     outTime = OutTimeDark,

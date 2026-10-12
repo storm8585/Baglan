@@ -22,9 +22,14 @@ object MessageLayoutPrecalculator {
         density: Float
     ): MessageDrawSpec {
         val tailWidth = 8f * density
-        val horizontalPadding = 11f * density
+        val flatPadding = 12f * density
+        val tailPadding = 18f * density
         val verticalPadding = 6f * density
-        val maxTextWidth = maxContainerWidth * 0.78f - horizontalPadding * 2f - tailWidth
+
+        val leftPadding = if (message.isOutgoing) flatPadding else tailPadding
+        val rightPadding = if (message.isOutgoing) tailPadding else flatPadding
+
+        val maxTextWidth = maxContainerWidth * 0.78f - leftPadding - rightPadding
 
         val timeString = timeFormat.format(Date(message.timestamp))
 
@@ -49,7 +54,7 @@ object MessageLayoutPrecalculator {
         val lastLineIndex = textLayoutResult.lineCount - 1
         val lastLineWidth = textLayoutResult.getLineRight(lastLineIndex) - textLayoutResult.getLineLeft(lastLineIndex)
 
-        val minTimeSpace = 8f * density
+        val minTimeSpace = 6f * density
         val fitsOnLastLine = (lastLineWidth + minTimeSpace + timeTotalWidth) <= maxTextWidth
 
         val bubbleWidth: Float
@@ -57,35 +62,27 @@ object MessageLayoutPrecalculator {
         val timeOffsetX: Float
         val timeOffsetY: Float
 
-        val textOffsetX = if (message.isOutgoing) horizontalPadding else horizontalPadding + tailWidth
+        val textOffsetX = leftPadding
         val textOffsetY = verticalPadding
 
         if (fitsOnLastLine) {
             val contentWidth = max(textWidth, lastLineWidth + minTimeSpace + timeTotalWidth)
-            bubbleWidth = max(contentWidth + horizontalPadding * 2f + tailWidth, 58f * density)
+            bubbleWidth = max(contentWidth + leftPadding + rightPadding, 64f * density)
             bubbleHeight = textHeight + verticalPadding * 2f
 
-            timeOffsetX = if (message.isOutgoing) {
-                bubbleWidth - tailWidth - horizontalPadding - timeTotalWidth
-            } else {
-                bubbleWidth - horizontalPadding - timeTotalWidth
-            }
-            timeOffsetY = bubbleHeight - verticalPadding - timeLayoutResult.size.height + 2f * density
+            timeOffsetX = bubbleWidth - rightPadding - timeTotalWidth
+            timeOffsetY = bubbleHeight - 6.5f * density - timeLayoutResult.size.height
         } else {
             val contentWidth = max(textWidth, timeTotalWidth)
-            bubbleWidth = max(contentWidth + horizontalPadding * 2f + tailWidth, 58f * density)
-            bubbleHeight = textHeight + verticalPadding * 2f + timeLayoutResult.size.height
+            bubbleWidth = max(contentWidth + leftPadding + rightPadding, 64f * density)
+            bubbleHeight = textHeight + verticalPadding * 2f + timeLayoutResult.size.height + 2f * density
 
-            timeOffsetX = if (message.isOutgoing) {
-                bubbleWidth - tailWidth - horizontalPadding - timeTotalWidth
-            } else {
-                bubbleWidth - horizontalPadding - timeTotalWidth
-            }
-            timeOffsetY = bubbleHeight - verticalPadding - timeLayoutResult.size.height
+            timeOffsetX = bubbleWidth - rightPadding - timeTotalWidth
+            timeOffsetY = bubbleHeight - 6.5f * density - timeLayoutResult.size.height
         }
 
         val statusOffsetX = timeOffsetX + timeLayoutResult.size.width + statusGap
-        val statusOffsetY = timeOffsetY + (timeLayoutResult.size.height - statusSize) / 2f + 1f * density
+        val statusOffsetY = timeOffsetY + (timeLayoutResult.size.height - statusSize) / 2f
 
         return MessageDrawSpec(
             message = message,
