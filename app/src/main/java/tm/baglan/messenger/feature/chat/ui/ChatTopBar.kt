@@ -13,9 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,9 +23,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import tm.baglan.messenger.R
 import tm.baglan.messenger.core.designsystem.BaglanPrimary
 import tm.baglan.messenger.core.designsystem.BaglanTheme
 import tm.baglan.messenger.core.designsystem.TopBarSubtitleStyle
@@ -61,9 +60,10 @@ fun ChatTopBar(
                     modifier = Modifier.size(48.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        painter = painterResource(id = R.drawable.ic_ab_back),
                         contentDescription = null,
-                        tint = BaglanTheme.colors.inText
+                        tint = BaglanTheme.colors.inText,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
 
@@ -113,9 +113,22 @@ fun ChatTopBar(
                     modifier = Modifier.size(48.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.MoreVert,
+                        painter = painterResource(id = R.drawable.outline_profile_call_24),
                         contentDescription = null,
-                        tint = BaglanTheme.colors.inText
+                        tint = BaglanTheme.colors.inText,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+
+                IconButton(
+                    onClick = {},
+                    modifier = Modifier.size(48.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_ab_other),
+                        contentDescription = null,
+                        tint = BaglanTheme.colors.inText,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
             }
