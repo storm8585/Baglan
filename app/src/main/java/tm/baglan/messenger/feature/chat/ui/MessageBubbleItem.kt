@@ -41,15 +41,13 @@ fun MessageBubbleItem(
     val bubbleWidthDp = with(LocalDensity.current) { spec.bubbleWidth.toDp() }
     val bubbleHeightDp = with(LocalDensity.current) { spec.bubbleHeight.toDp() }
 
-    val verticalPadding = when {
-        spec.message.isBottomNear -> 2.dp
-        else -> 6.dp
-    }
+    val topPadding = if (spec.message.isTopNear) 1.dp else 3.dp
+    val bottomPadding = if (spec.message.isBottomNear) 1.dp else 3.dp
 
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = verticalPadding),
+            .padding(start = 8.dp, end = 8.dp, top = topPadding, bottom = bottomPadding),
         contentAlignment = if (isOutgoing) Alignment.CenterEnd else Alignment.CenterStart
     ) {
         Box(

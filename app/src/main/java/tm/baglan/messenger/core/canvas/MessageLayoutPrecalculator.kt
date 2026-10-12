@@ -23,7 +23,7 @@ object MessageLayoutPrecalculator {
     ): MessageDrawSpec {
         val tailWidth = 8f * density
         val flatPadding = 12f * density
-        val tailPadding = 18f * density
+        val tailPadding = if (message.isBottomNear) 12f * density else 18f * density
         val verticalPadding = 6f * density
 
         val leftPadding = if (message.isOutgoing) flatPadding else tailPadding

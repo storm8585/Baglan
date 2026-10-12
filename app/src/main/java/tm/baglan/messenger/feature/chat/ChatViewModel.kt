@@ -81,8 +81,8 @@ class ChatViewModel : ViewModel() {
             val prev = messages.getOrNull(i - 1)
             val next = messages.getOrNull(i + 1)
 
-            val isBottomNear = prev != null && prev.isOutgoing == current.isOutgoing && (prev.timestamp - current.timestamp) < 60_000
-            val isTopNear = next != null && next.isOutgoing == current.isOutgoing && (current.timestamp - next.timestamp) < 60_000
+            val isBottomNear = prev != null && prev.isOutgoing == current.isOutgoing && (prev.timestamp - current.timestamp) < 300_000L
+            val isTopNear = next != null && next.isOutgoing == current.isOutgoing && (current.timestamp - next.timestamp) < 300_000L
 
             result.add(current.copy(isTopNear = isTopNear, isBottomNear = isBottomNear))
         }
