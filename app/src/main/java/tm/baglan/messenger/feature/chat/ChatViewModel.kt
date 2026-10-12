@@ -103,7 +103,7 @@ class ChatViewModel : ViewModel() {
             Message(
                 id = 2L,
                 senderId = 1L,
-                text = "Evet, şu an 1'e 1 chat ekranını Telegram'ın orijinal canvas mimarisiyle yazıyoruz.",
+                text = "Evet, şu an 1'e 1 chat ekranını Baglan'ın orijinal canvas mimarisiyle yazıyoruz.",
                 timestamp = baseTime + 60_000,
                 isOutgoing = true,
                 status = MessageStatus.READ
@@ -119,7 +119,7 @@ class ChatViewModel : ViewModel() {
             Message(
                 id = 4L,
                 senderId = 101L,
-                text = "Harika! Telegram gibi kuyruklu balonlar ve okundu tikleri de çalışıyor mu?",
+                text = "Harika! Baglan'ın kuyruklu balonları ve okundu tikleri de çalışıyor mu?",
                 timestamp = baseTime + 120_000,
                 isOutgoing = false,
                 status = MessageStatus.READ

@@ -1,6 +1,6 @@
 package tm.baglan.messenger.feature.chat.ui
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,7 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import tm.baglan.messenger.core.canvas.MessageDrawSpec
 import tm.baglan.messenger.core.canvas.MessageLayoutPrecalculator
-import tm.baglan.messenger.core.designsystem.BaglanTheme
+import tm.baglan.messenger.core.wallpaper.BaglanWallpaper
 import tm.baglan.messenger.feature.chat.ChatUiEvent
 import tm.baglan.messenger.feature.chat.ChatViewModel
 
@@ -33,60 +33,64 @@ fun ChatScreen(
     val textMeasurer = rememberTextMeasurer()
     val density = LocalDensity.current.density
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(BaglanTheme.colors.chatBackground)
-            .imePadding()
+    Box(
+        modifier = modifier.fillMaxSize()
     ) {
-        ChatTopBar(
-            user = uiState.user,
-            onBackClicked = { viewModel.onEvent(ChatUiEvent.OnBackClicked) }
-        )
+        BaglanWallpaper()
 
-        BoxWithConstraints(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
+                .fillMaxSize()
+                .imePadding()
         ) {
-            val maxContainerWidthPx = constraints.maxWidth.toFloat()
+            ChatTopBar(
+                user = uiState.user,
+                onBackClicked = { viewModel.onEvent(ChatUiEvent.OnBackClicked) }
+            )
 
-            val drawSpecs by produceState(
-                initialValue = emptyList<MessageDrawSpec>(),
-                key1 = uiState.messages,
-                key2 = maxContainerWidthPx
+            BoxWithConstraints(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
             ) {
-                value = withContext(Dispatchers.Default) {
-                    uiState.messages.map { message ->
-                        MessageLayoutPrecalculator.precalculate(
-                            message = message,
-                            textMeasurer = textMeasurer,
-                            maxContainerWidth = maxContainerWidthPx,
-                            density = density
-                        )
+                val maxContainerWidthPx = constraints.maxWidth.toFloat()
+
+                val drawSpecs by produceState(
+                    initialValue = emptyList<MessageDrawSpec>(),
+                    key1 = uiState.messages,
+                    key2 = maxContainerWidthPx
+                ) {
+                    value = withContext(Dispatchers.Default) {
+                        uiState.messages.map { message ->
+                            MessageLayoutPrecalculator.precalculate(
+                                message = message,
+                                textMeasurer = textMeasurer,
+                                maxContainerWidth = maxContainerWidthPx,
+                                density = density
+                            )
+                        }
+                    }
+                }
+
+                LazyColumn(
+                    reverseLayout = true,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(
+                        items = drawSpecs,
+                        key = { it.message.id }
+                    ) { spec ->
+                        MessageBubbleItem(spec = spec)
                     }
                 }
             }
 
-            LazyColumn(
-                reverseLayout = true,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(
-                    items = drawSpecs,
-                    key = { it.message.id }
-                ) { spec ->
-                    MessageBubbleItem(spec = spec)
-                }
-            }
+            ChatInputBar(
+                text = uiState.inputText,
+                onTextChanged = { viewModel.onEvent(ChatUiEvent.OnInputChanged(it)) },
+                onSendMessage = { viewModel.onEvent(ChatUiEvent.OnSendMessage) },
+                onAttachClicked = { viewModel.onEvent(ChatUiEvent.OnAttachClicked) }
+            )
         }
-
-        ChatInputBar(
-            text = uiState.inputText,
-            onTextChanged = { viewModel.onEvent(ChatUiEvent.OnInputChanged(it)) },
-            onSendMessage = { viewModel.onEvent(ChatUiEvent.OnSendMessage) },
-            onAttachClicked = { viewModel.onEvent(ChatUiEvent.OnAttachClicked) }
-        )
     }
 }
-
