@@ -3,6 +3,7 @@ package tm.baglan.messenger.feature.chat.ui
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -63,6 +64,7 @@ fun ChatInputBar(
 
     val micComposition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.voice_and_video))
     var isVideoMode by remember { mutableStateOf(false) }
+    var isAudioVideoAnimating by remember { mutableStateOf(false) }
     val lottieProgress = remember { Animatable(0.5f) }
     val coroutineScope = rememberCoroutineScope()
 
@@ -276,20 +278,23 @@ fun ChatInputBar(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
                             onClick = {
+                                if (isAudioVideoAnimating) return@clickable
+                                isAudioVideoAnimating = true
                                 isVideoMode = !isVideoMode
                                 coroutineScope.launch {
                                     if (isVideoMode) {
                                         lottieProgress.animateTo(
                                             targetValue = 1f,
-                                            animationSpec = tween(durationMillis = 300, easing = EaseOutQuint)
+                                            animationSpec = tween(durationMillis = 500, easing = LinearEasing)
                                         )
                                     } else {
                                         lottieProgress.snapTo(0f)
                                         lottieProgress.animateTo(
                                             targetValue = 0.5f,
-                                            animationSpec = tween(durationMillis = 300, easing = EaseOutQuint)
+                                            animationSpec = tween(durationMillis = 500, easing = LinearEasing)
                                         )
                                     }
+                                    isAudioVideoAnimating = false
                                 }
                             }
                         ),
