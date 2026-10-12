@@ -97,15 +97,15 @@ fun ChatScreen(
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
                 .imePadding()
-                .height(96.dp + navBarBottom)
+                .height(54.dp + navBarBottom)
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
                             panelBg.copy(alpha = 0f),
-                            panelBg.copy(alpha = 0.25f),
-                            panelBg.copy(alpha = 0.55f),
-                            panelBg.copy(alpha = 0.82f),
-                            panelBg.copy(alpha = 0.96f)
+                            panelBg.copy(alpha = 0.04f),
+                            panelBg.copy(alpha = 0.10f),
+                            panelBg.copy(alpha = 0.18f),
+                            panelBg.copy(alpha = 0.28f)
                         )
                     )
                 )
