@@ -146,7 +146,7 @@ fun ChatInputBar(
             .fillMaxWidth()
             .navigationBarsPadding()
             .padding(start = 7.dp, end = 7.dp, top = 4.dp, bottom = 9.dp)
-            .shadow(elevation = 1.dp, shape = RoundedCornerShape(22.dp))
+            .shadow(elevation = 2.dp, shape = RoundedCornerShape(22.dp))
             .clip(RoundedCornerShape(22.dp))
             .background(BaglanTheme.colors.inputBackground)
             .heightIn(min = 44.dp)
