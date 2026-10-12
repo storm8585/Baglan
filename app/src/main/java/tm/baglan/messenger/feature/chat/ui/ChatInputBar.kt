@@ -270,7 +270,7 @@ fun ChatInputBar(
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.search_voice_filled),
+                        painter = painterResource(id = R.drawable.ic_mic_filled),
                         contentDescription = null,
                         tint = Color.White,
                         modifier = Modifier.size(22.dp)
@@ -280,3 +280,4 @@ fun ChatInputBar(
         }
     }
 }
+
