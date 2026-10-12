@@ -24,7 +24,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,6 +39,10 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.rememberLottieComposition
+import kotlinx.coroutines.launch
 import tm.baglan.messenger.R
 import tm.baglan.messenger.core.designsystem.BaglanPrimary
 import tm.baglan.messenger.core.designsystem.BaglanTheme
@@ -53,6 +60,11 @@ fun ChatInputBar(
 ) {
     val density = LocalDensity.current.density
     val hasText = text.isNotBlank()
+
+    val micComposition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.voice_and_video))
+    var isVideoMode by remember { mutableStateOf(false) }
+    val lottieProgress = remember { Animatable(0.5f) }
+    val coroutineScope = rememberCoroutineScope()
 
     val appearProgress = remember { Animatable(0f) }
     LaunchedEffect(hasText) {
@@ -222,7 +234,6 @@ fun ChatInputBar(
                             scaleY = sendButtonScale
                             alpha = sendButtonAlpha
                         }
-                        .shadow(elevation = 1.dp, shape = CircleShape)
                         .clip(CircleShape)
                         .background(BaglanPrimary)
                         .clickable(
@@ -237,7 +248,7 @@ fun ChatInputBar(
                         contentDescription = null,
                         tint = Color.White,
                         modifier = Modifier
-                            .size(22.dp)
+                            .size(24.dp)
                             .graphicsLayer {
                                 translationX = -24f * density * (1f - p)
                                 translationY = 24f * density * (1f - p)
@@ -259,25 +270,47 @@ fun ChatInputBar(
                             scaleY = micButtonScale
                             alpha = micButtonAlpha
                         }
-                        .shadow(elevation = 1.dp, shape = CircleShape)
                         .clip(CircleShape)
                         .background(BaglanPrimary)
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
-                            onClick = {}
+                            onClick = {
+                                isVideoMode = !isVideoMode
+                                coroutineScope.launch {
+                                    if (isVideoMode) {
+                                        lottieProgress.animateTo(
+                                            targetValue = 1f,
+                                            animationSpec = tween(durationMillis = 300, easing = EaseOutQuint)
+                                        )
+                                    } else {
+                                        lottieProgress.snapTo(0f)
+                                        lottieProgress.animateTo(
+                                            targetValue = 0.5f,
+                                            animationSpec = tween(durationMillis = 300, easing = EaseOutQuint)
+                                        )
+                                    }
+                                }
+                            }
                         ),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_mic_filled),
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(22.dp)
-                    )
+                    if (micComposition != null) {
+                        LottieAnimation(
+                            composition = micComposition,
+                            progress = { lottieProgress.value },
+                            modifier = Modifier.size(24.dp)
+                        )
+                    } else {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_mic_filled),
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
                 }
             }
         }
     }
 }
-
