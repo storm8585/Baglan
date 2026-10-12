@@ -32,7 +32,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
@@ -146,7 +145,6 @@ fun ChatInputBar(
             .fillMaxWidth()
             .navigationBarsPadding()
             .padding(start = 7.dp, end = 7.dp, top = 4.dp, bottom = 9.dp)
-            .shadow(elevation = 2.dp, shape = RoundedCornerShape(22.dp))
             .clip(RoundedCornerShape(22.dp))
             .background(BaglanTheme.colors.inputBackground)
             .heightIn(min = 44.dp)

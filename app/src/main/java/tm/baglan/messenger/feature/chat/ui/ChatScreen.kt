@@ -21,7 +21,6 @@ import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
@@ -30,6 +29,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import tm.baglan.messenger.core.canvas.MessageDrawSpec
 import tm.baglan.messenger.core.canvas.MessageLayoutPrecalculator
+import tm.baglan.messenger.core.designsystem.BaglanTheme
 import tm.baglan.messenger.core.wallpaper.BaglanWallpaper
 import tm.baglan.messenger.feature.chat.ChatUiEvent
 import tm.baglan.messenger.feature.chat.ChatViewModel
@@ -43,6 +43,7 @@ fun ChatScreen(
     val textMeasurer = rememberTextMeasurer()
     val density = LocalDensity.current.density
     val navBarBottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+    val panelBg = BaglanTheme.colors.inputBackground
 
     Box(
         modifier = modifier.fillMaxSize()
@@ -100,11 +101,11 @@ fun ChatScreen(
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
-                            Color.Transparent,
-                            Color(0x05000000),
-                            Color(0x14000000),
-                            Color(0x28000000),
-                            Color(0x40000000)
+                            panelBg.copy(alpha = 0f),
+                            panelBg.copy(alpha = 0.25f),
+                            panelBg.copy(alpha = 0.55f),
+                            panelBg.copy(alpha = 0.82f),
+                            panelBg.copy(alpha = 0.96f)
                         )
                     )
                 )
