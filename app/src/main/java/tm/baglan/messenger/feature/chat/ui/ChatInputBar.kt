@@ -156,7 +156,7 @@ fun ChatInputBar(
                     painter = painterResource(id = R.drawable.msg_emoji_smiles),
                     contentDescription = null,
                     tint = BaglanTheme.colors.inputIcons,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(28.dp)
                 )
             }
 
